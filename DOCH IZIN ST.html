@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>DASHBOARD IZIN KELUAR</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    color:white;
+    min-height:100vh;
+
+    background:
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url('gj.jpg');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+/* Tema Scatter & Mahjong */
+body::before{
+    content:"🎲 🀄 🎲 🀄 🎲 🀄 🎲 🀄 🎲 🀄";
+    position:fixed;
+    top:20px;
+    left:20px;
+    font-size:45px;
+    opacity:0.10;
+    letter-spacing:20px;
+}
+
+.container{
+    width:95%;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    color:#d9a7ff;
+}
+
+#jam{
+    text-align:center;
+    font-size:35px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:rgba(0,0,0,0.70);
+}
+
+th{
+    background:#6a0dad;
+    padding:12px;
+}
+
+td{
+    border:1px solid #444;
+    padding:10px;
+    text-align:center;
+}
+
+input{
+    padding:5px;
+    border-radius:5px;
+    border:none;
+    width:140px;
+}
+
+button{
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.mulai{
+    background:#00c853;
+    color:white;
+}
+
+.masuk{
+    background:#2962ff;
+    color:white;
+}
+
+.aman{
+    color:#00ff66;
+    font-weight:bold;
+}
+
+.lewat{
+    color:#ff1744;
+    font-weight:bold;
+}
+
+#tambah{
+    background:#8e24aa;
+    color:white;
+    margin-top:15px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🀄IZIN KELUAR STAF SITUSTOTO🎲</h1>
+
+<div id="jam"></div>
+
+<table id="tbl">
+
+<tr>
+<th>No</th>
+<th>Nama Staf</th>
+<th>Jabatan</th>
+<th>Jam Keluar</th>
+<th>Jam Masuk</th>
+<th>Lama Keluar</th>
+<th>Status</th>
+<th>Aksi</th>
+</tr>
+
+</table>
+
+<button id="tambah">
++ Tambah Staf
+</button>
+
+</div>
+
+<script>
+
+/* JAM BERJALAN */
+setInterval(function(){
+document.getElementById("jam")
+.innerHTML=
+new Date().toLocaleString("id-ID");
+},1000);
+
+
+/* DATA DISIMPAN */
+let data =
+JSON.parse(localStorage.getItem("izin"))
+||[
+{
+nama:"indra ken",
+jabatan:"SKDA",
+mulai:null,
+jamKeluar:"-",
+jamMasuk:"-",
+lama:"-",
+status:"Belum Izin"
+}
+];
+
+
+/* TAMPILKAN TABEL */
+function tampil(){
+
+let html=`
+<tr>
+<th>No</th>
+<th>Nama Staf</th>
+<th>Jabatan</th>
+<th>Jam Keluar</th>
+<th>Jam Masuk</th>
+<th>Lama Keluar</th>
+<th>Status</th>
+<th>Aksi</th>
+</tr>
+`;
+
+data.forEach((x,i)=>{
+
+html+=`
+<tr>
+
+<td>${i+1}</td>
+
+<td>
+<input value="${x.nama}"
+onchange="ubahNama(${i},this.value)">
+</td>
+
+<td>
+<input value="${x.jabatan}"
+onchange="ubahJabatan(${i},this.value)">
+</td>
+
+<td>${x.jamKeluar}</td>
+
+<td>${x.jamMasuk}</td>
+
+<td>${x.lama}</td>
+
+<td class="${
+x.status=='AMAN BOY'
+?'aman':
+x.status=='LEWAT BOY'
+?'lewat':''
+}">
+${x.status}
+</td>
+
+<td>
+
+<button class="mulai"
+onclick="mulai(${i})">
+MULAI
+</button>
+
+<button class="masuk"
+onclick="masuk(${i})">
+MASUK
+</button>
+
+</td>
+
+</tr>
+`;
+
+});
+
+document.getElementById("tbl")
+.innerHTML=html;
+
+simpan();
+
+}
+
+
+/* SIMPAN */
+function simpan(){
+
+localStorage.setItem(
+"izin",
+JSON.stringify(data)
+);
+
+}
+
+
+/* UBAH NAMA */
+function ubahNama(i,v){
+
+data[i].nama=v;
+simpan();
+
+}
+
+
+/* UBAH JABATAN */
+function ubahJabatan(i,v){
+
+data[i].jabatan=v;
+simpan();
+
+}
+
+
+/* MULAI */
+function mulai(i){
+
+let sekarang =
+new Date();
+
+data[i].mulai =
+sekarang.getTime();
+
+data[i].jamKeluar =
+sekarang.toLocaleTimeString("id-ID");
+
+data[i].jamMasuk="-";
+data[i].lama="-";
+data[i].status="Sedang Izin";
+
+tampil();
+
+}
+
+
+/* MASUK */
+function masuk(i){
+
+if(data[i].mulai==null){
+
+alert(
+"Tekan MULAI terlebih dahulu."
+);
+
+return;
+
+}
+
+let sekarang =
+new Date();
+
+data[i].jamMasuk =
+sekarang.toLocaleTimeString("id-ID");
+
+let menit =
+Math.floor(
+(sekarang.getTime()
+-data[i].mulai)
+/1000/60
+);
+
+data[i].lama =
+menit+" Menit";
+
+if(menit<=15){
+
+data[i].status=
+"AMAN BOY";
+
+}
+else{
+
+data[i].status=
+"LEWAT BOY";
+
+}
+
+data[i].mulai=null;
+
+tampil();
+
+}
+
+
+/* TAMBAH STAF */
+document.getElementById("tambah")
+.onclick=function(){
+
+data.push({
+
+nama:"",
+jabatan:"",
+mulai:null,
+jamKeluar:"-",
+jamMasuk:"-",
+lama:"-",
+status:"Belum Izin"
+
+});
+
+tampil();
+
+};
+
+
+tampil();
+
+</script>
+
+</body>
+</html>
